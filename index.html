@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>雜誌與課本英文單字複習器</title>
+    <style>
+        :root {
+            --bg-color: #f7f9fa;
+            --card-bg: #ffffff;
+            --primary-color: #4a6fa5;
+            --primary-hover: #3b5984;
+            --text-main: #2c3e50;
+            --text-sub: #7f8c8d;
+            --border-color: #e2e8f0;
+            --correct-color: #27ae60;
+            --wrong-color: #e74c3c;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+            margin-bottom: 16px;
+        }
+
+        h1 { font-size: 22px; text-align: center; margin: 0 0 8px 0; }
+        .subtitle { color: var(--text-sub); text-align: center; font-size: 14px; margin-bottom: 16px; }
+
+        .unit-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .btn {
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .btn.active {
+            background-color: var(--primary-color) !important;
+            color: #ffffff !important;
+            border-color: var(--primary-color) !important;
+        }
+
+        .btn-main {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: #ffffff;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .flashcard {
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            text-align: center;
+            padding: 15px;
+        }
+
+        .word-title { font-size: 26px; font-weight: bold; margin-bottom: 8px; line-height: 1.4; }
+        .word-pos { font-size: 14px; color: var(--primary-color); background: #eef2f7; padding: 2px 8px; border-radius: 4px; display: inline-block; margin-bottom: 10px; }
+        .word-meaning { font-size: 22px; font-weight: 500; color: #333; }
+        
+        .word-example { 
+            font-size: 16px; 
+            color: #34495e; 
+            margin-top: 14px; 
+            line-height: 1.5; 
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: left;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .option-btn {
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: white;
+            font-size: 15px;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .option-detail {
+            font-size: 13px;
+            color: var(--text-sub);
+            margin-top: 2px;
+        }
+
+        .option-btn.correct { background-color: var(--correct-color) !important; color: white !important; border-color: var(--correct-color) !important; }
+        .option-btn.correct .option-detail { color: #e8f8f0 !important; }
+
+        .option-btn.wrong { background-color: var(--wrong-color) !important; color: white !important; border-color: var(--wrong-color) !important; }
+        .option-btn.wrong .option-detail { color: #fdeded !important; }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 設定頁面 -->
+        <div id="setup-page" class="card">
+            <h1>英文單字複習器</h1>
+            <div class="subtitle">雜誌 + 課本 + 單字書範圍</div>
+
+            <h3 style="font-size: 15px;">1. 選擇單字範圍</h3>
+            <div class="unit-grid">
+                <button class="btn unit-btn active" onclick="toggleUnit('U4')">Unit 4</button>
+                <button class="btn unit-btn active" onclick="toggleUnit('U5')">Unit 5</button>
+                <button class="btn unit-btn active" onclick="toggleUnit('U6')">Unit 6</button>
+                <button class="btn unit-btn active" onclick="toggleUnit('U7')">Unit 7</button>
+                <button class="btn unit-btn active" onclick="toggleUnit('U8')">Unit 8</button>
+                <button class="btn unit-btn active" onclick="toggleUnit('U9')">Unit 9</button>
+                <button class="btn unit-btn active" onclick="toggleUnit('U10')">Unit 10</button>
+                <button class="btn unit-btn active" onclick="toggleUnit('U11')">Unit 11</button>
+                <button class="btn unit-btn active" onclick="toggleUnit('U12')">Unit 12</button>
+                <button class="btn unit-btn active" onclick="toggleUnit('U13')">Unit 13</button>
+                <button class="btn unit-btn active" onclick="toggleUnit('U14')">Unit 14</button>
+                <button class="btn unit-btn active" onclick="toggleUnit('U17')">Unit 17</button>
+                <button class="btn unit-btn active" onclick="toggleUnit('U18')">Unit 18</button>
+                <button class="btn unit-btn active" onclick="toggleUnit('R2')">R2</button>
+            </div>
+
+            <h3 style="font-size: 15px;">2. 選擇複習模式</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px;">
+                <button id="mode-card" class="btn active" onclick="setMode('card')">閃卡翻面</button>
+                <button id="mode-choice" class="btn" onclick="setMode('choice')">看英選中</button>
+                <button id="mode-zh-choice" class="btn" onclick="setMode('zh-choice')">看中選英</button>
+                <button id="mode-context" class="btn" onclick="setMode('context')">📝 句子填空題</button>
+            </div>
+
+            <button class="btn-main" onclick="startPractice()">開始複習</button>
+        </div>
+
+        <!-- 練習頁面 -->
+        <div id="practice-page" class="card hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <button class="btn" style="padding: 6px 12px; font-size: 12px;" onclick="backToSetup()">← 返回設定</button>
+                <span id="progress-text" style="color: var(--text-sub); font-size: 14px;">0 / 0</span>
+            </div>
+
+            <!-- 閃卡模式 View -->
+            <div id="flashcard-view">
+                <div class="flashcard" onclick="flipCard()">
+                    <div id="card-front">
+                        <div id="fc-en" class="word-title"></div>
+                        <div id="fc-pos-front" class="word-pos"></div>
+                        <div style="font-size: 13px; color: var(--text-sub); margin-top: 10px;">(點擊顯示中文與例句)</div>
+                    </div>
+                    <div id="card-back" class="hidden">
+                        <div id="fc-zh" class="word-meaning"></div>
+                        <div id="fc-pos-back" class="word-pos" style="margin-top: 8px;"></div>
+                        <div id="fc-example" class="word-example"></div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button class="btn" style="flex: 1;" onclick="prevCard()">上一個</button>
+                    <button class="btn-main" style="flex: 1;" onclick="nextCard()">下一個</button>
+                </div>
+            </div>
+
+            <!-- 選擇題 / 句子填空模式 View -->
+            <div id="choice-view" class="hidden">
+                <div style="text-align: center; margin: 15px 0;">
+                    <div id="quiz-prompt" class="word-title"></div>
+                    <div id="quiz-pos" class="word-pos"></div>
+                </div>
+                <div id="options-container" class="options-grid"></div>
+                <div id="quiz-next-area" class="hidden" style="margin-top: 15px;">
+                    <div id="quiz-example" class="word-example"></div>
+                    <button class="btn-main" style="margin-top: 10px;" onclick="nextCard()">下一題</button>
+                </div>
+            </div>
+
+            <!-- 結算/錯題練習 View -->
+            <div id="result-view" class="hidden" style="text-align: center; padding: 20px 0;">
+                <h2>測驗完成！</h2>
+                <p id="result-stats" style="font-size: 18px; color: var(--text-main); margin: 15px 0;"></p>
+                <button id="retry-wrong-btn" class="btn-main" style="margin-bottom: 10px;" onclick="startWrongPractice()">重新練習錯題</button>
+                <button class="btn" style="width: 100%;" onclick="backToSetup()">返回首頁</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const vocabulary = [
+            // --- Unit 4 ---
+            { en: "joyous", pos: "adj.", zh: "令人愉快的", example: "Christmas is a joyous holiday for many families.", unit: "U4" },
+            { en: "accompany", pos: "v.", zh: "陪伴", example: "Children must be accompanied by an adult.", unit: "U4" },
+            { en: "essential", pos: "adj.", zh: "本質的；必要的", example: "Water is essential for life.", unit: "U4" },
+            { en: "concept", pos: "n.", zh: "概念", example: "He introduced a new concept in physics.", unit: "U4" },
+            { en: "mourn", pos: "v.", zh: "哀悼", example: "They mourned the death of their leader.", unit: "U4" },
+            { en: "sorrow", pos: "n.", zh: "悲傷", example: "She expressed her sorrow over the loss.", unit: "U4" },
+            { en: "occasion", pos: "n.", zh: "場合", example: "It was a formal occasion requiring suits.", unit: "U4" },
+            { en: "reunion", pos: "n.", zh: "重逢；聚會", example: "We had a family reunion during the holidays.", unit: "U4" },
+            { en: "anticipate", pos: "v.", zh: "期盼；預期", example: "We anticipate good results from the project.", unit: "U4" },
+            { en: "arrival", pos: "n.", zh: "到達", example: "We waited for the arrival of the train.", unit: "U4" },
+            { en: "decorate", pos: "v.", zh: "裝飾", example: "They decorated the tree with bright lights.", unit: "U4" },
+            { en: "feast", pos: "n./v.", zh: "盛宴；盡情享用", example: "They enjoyed a marvelous feast at the wedding.", unit: "U4" },
+            { en: "dawn", pos: "n.", zh: "黎明", example: "The birds started singing at dawn.", unit: "U4" },
+            { en: "transform", pos: "v.", zh: "使改變形態", example: "The caterpillar transformed into a butterfly.", unit: "U4" },
+            { en: "resemble", pos: "v.", zh: "看起來像", example: "She strongly resembles her mother.", unit: "U4" },
+            { en: "mock", pos: "v./adj.", zh: "嘲弄；模擬的", example: "Do not mock others for their mistakes.", unit: "U4" },
+            { en: "recognize", pos: "v.", zh: "承認；認出", example: "I didn't recognize him in his new suit.", unit: "U4" },
+            { en: "inevitable", pos: "adj.", zh: "不可避免的", example: "Change is an inevitable part of life.", unit: "U4" },
+            { en: "cycle", pos: "n.", zh: "循環", example: "The water cycle is vital for the Earth.", unit: "U4" },
+            { en: "await", pos: "v.", zh: "等待", example: "A warm welcome awaits the visitors.", unit: "U4" },
+
+            // --- Unit 5 ---
+            { en: "scenic", pos: "adj.", zh: "風景優美的", example: "We took a drive along the scenic coast.", unit: "U5" },
+            { en: "stall", pos: "n./v.", zh: "攤位；拖延", example: "He bought snacks from a food stall.", unit: "U5" },
+            { en: "cliff", pos: "n.", zh: "懸崖；峭壁", example: "The hotel stands on a steep cliff.", unit: "U5" },
+            { en: "stunning", pos: "adj.", zh: "極為美觀的", example: "The view from the mountain was stunning.", unit: "U5" },
+            { en: "bounce", pos: "v.", zh: "使彈起", example: "The ball bounced off the wall.", unit: "U5" },
+            { en: "cluster", pos: "n.", zh: "群、串", example: "A cluster of tourists gathered around.", unit: "U5" },
+            { en: "compact", pos: "adj.", zh: "緊湊的；小型的", example: "The camera is small and compact.", unit: "U5" },
+
+            // --- Unit 6 ---
+            { en: "blossom", pos: "n./v.", zh: "花朵；開花", example: "Cherry blossoms bloom in spring.", unit: "U6" },
+            { en: "rustle", pos: "v.", zh: "沙沙作響", example: "Leaves rustle in the autumn breeze.", unit: "U6" },
+            { en: "landscape", pos: "n.", zh: "景色", example: "The winter landscape was covered in snow.", unit: "U6" },
+            { en: "splendor", pos: "n.", zh: "壯麗", example: "The splendor of the palace amazed everyone.", unit: "U6" },
+            { en: "previously", pos: "adv.", zh: "先前地", example: "She previously worked as a teacher.", unit: "U6" },
+            { en: "capital", pos: "n.", zh: "首都", example: "Tokyo is the capital of Japan.", unit: "U6" },
+            { en: "boast", pos: "v.", zh: "以...為傲", example: "The hotel boasts a world-class pool.", unit: "U6" },
+            { en: "historic", pos: "adj.", zh: "歷史悠久的", example: "They visited several historic places.", unit: "U6" },
+            { en: "entrance", pos: "n.", zh: "大門；入口", example: "Wait for me at the entrance.", unit: "U6" },
+            { en: "magnificent", pos: "adj.", zh: "壯麗的", example: "The castle had a magnificent view.", unit: "U6" },
+            { en: "breathtaking", pos: "adj.", zh: "驚人的", example: "The view was absolutely breathtaking.", unit: "U6" },
+            { en: "leisurely", pos: "adj./adv.", zh: "悠閒的", example: "They took a leisurely walk along the river.", unit: "U6" },
+            { en: "delicate", pos: "adj.", zh: "精美的", example: "Handle the delicate glass with care.", unit: "U6" },
+            { en: "distinctive", pos: "adj.", zh: "獨特的", example: "The bird has distinctive blue feathers.", unit: "U6" },
+            { en: "elegant", pos: "adj.", zh: "雅緻的", example: "She wore an elegant dress to the ball.", unit: "U6" },
+            { en: "appearance", pos: "n.", zh: "外表", example: "He pays great attention to his appearance.", unit: "U6" },
+            { en: "literature", pos: "n.", zh: "文學", example: "She is deeply interested in English literature.", unit: "U6" },
+            { en: "deliberate", pos: "adj.", zh: "小心的；深思熟慮的", example: "He took a deliberate action to fix it.", unit: "U6" },
+            { en: "destination", pos: "n.", zh: "目的地", example: "Paris is a popular travel destination.", unit: "U6" },
+            { en: "slope", pos: "n.", zh: "斜坡", example: "Skiers raced down the snowy slope.", unit: "U6" },
+            { en: "tumble", pos: "v.", zh: "滾落", example: "The apples tumbled out of the bag.", unit: "U6" },
+            { en: "bruised", pos: "adj.", zh: "受傷的；瘀青的", example: "He had a bruised knee from falling.", unit: "U6" },
+            { en: "superior", pos: "adj.", zh: "優於...", example: "This model is superior to the old one.", unit: "U6" },
+            { en: "intimately", pos: "adv.", zh: "了如指掌地", example: "She knows the city intimately.", unit: "U6" },
+            { en: "skillfully", pos: "adv.", zh: "熟練地", example: "He skillfully performed the operation.", unit: "U6" },
+            { en: "crop", pos: "n.", zh: "作物", example: "Farmers hope for a good crop this year.", unit: "U6" },
+            { en: "path", pos: "n.", zh: "小路", example: "Follow the path through the forest.", unit: "U6" },
+            { en: "navigate", pos: "v.", zh: "行走；導航", example: "Sailors use stars to navigate.", unit: "U6" },
+            { en: "outsider", pos: "n.", zh: "外人", example: "He felt like an outsider in the group.", unit: "U6" },
+            { en: "adapt", pos: "v.", zh: "使適應", example: "Animals must adapt to survive.", unit: "U6" },
+            { en: "cling", pos: "v.", zh: "抓緊", example: "The baby monkey clung to its mother.", unit: "U6" },
+            { en: "twinkle", pos: "v.", zh: "閃耀", example: "Stars twinkle brightly in the sky.", unit: "U6" },
+            { en: "pity", pos: "n.", zh: "憐憫；遺憾", example: "It is a pity that you cannot come.", unit: "U6" },
+            { en: "awe", pos: "n.", zh: "敬畏", example: "We stood in awe of the giant mountain.", unit: "U6" },
+            { en: "smoothness", pos: "n.", zh: "平滑", example: "She admired the smoothness of the silk.", unit: "U6" },
+            { en: "opposition", pos: "n.", zh: "反對", example: "The plan faced strong opposition.", unit: "U6" },
+            { en: "peculiar", pos: "adj.", zh: "奇怪的", example: "There was a peculiar smell in the room.", unit: "U6" },
+            { en: "confront", pos: "v.", zh: "面臨", example: "You must confront your problems.", unit: "U6" },
+            { en: "dilemma", pos: "n.", zh: "進退兩難的困境", example: "He faced a difficult dilemma.", unit: "U6" },
+            { en: "nevertheless", pos: "adv.", zh: "儘管如此", example: "It was raining; nevertheless, we went out.", unit: "U6" },
+            { en: "gaze", pos: "v.", zh: "凝視", example: "She gazed at the stars for hours.", unit: "U6" },
+            { en: "envision", pos: "v.", zh: "想像", example: "I envision a bright future ahead.", unit: "U6" },
+            { en: "flee", pos: "v.", zh: "逃離", example: "The villagers fled from the danger.", unit: "U6" },
+
+            // --- Unit 7~14 (保留之前內容) ---
+            { en: "subtle", pos: "adj.", zh: "細微的", example: "There is a subtle difference between them.", unit: "U7" },
+            { en: "disorder", pos: "n.", zh: "失調", example: "Eating disorders require medical care.", unit: "U8" },
+            { en: "beverage", pos: "n.", zh: "飲料", example: "Hot beverages are served in winter.", unit: "U9" },
+            { en: "marathon", pos: "n.", zh: "馬拉松", example: "She ran her first marathon last year.", unit: "U10" },
+            { en: "species", pos: "n.", zh: "物種", example: "Many rare species live in rainforests.", unit: "U11" },
+            { en: "application", pos: "n.", zh: "申請", example: "Fill out the job application form.", unit: "U12" },
+            { en: "enormous", pos: "adj.", zh: "巨大的", example: "An enormous rock blocked the path.", unit: "U13" },
+            { en: "preference", pos: "n.", zh: "偏好", example: "State your preference for food.", unit: "U14" },
+
+            // --- Unit 17 (單字書) ---
+            { en: "annual", pos: "adj.", zh: "一年一度的", example: "The annual meeting takes place in May.", unit: "U17" },
+            { en: "turn out", pos: "phr.", zh: "出席；結果是", example: "A huge crowd turned out for the event.", unit: "U17" },
+            { en: "admire", pos: "v.", zh: "欣賞", example: "I really admire your courage.", unit: "U17" },
+            { en: "wrap", pos: "v.", zh: "用...包裹", example: "She wrapped the present in blue paper.", unit: "U17" },
+            { en: "in advance", pos: "phr.", zh: "事先", example: "Please pay for tickets in advance.", unit: "U17" },
+            { en: "expert", pos: "n./adj.", zh: "專門的；專家", example: "He is an expert in medical science.", unit: "U17" },
+            { en: "instrument", pos: "n.", zh: "樂器；工具", example: "She plays several musical instruments.", unit: "U17" },
+            { en: "decoration", pos: "n.", zh: "裝飾品", example: "They put up Christmas decorations.", unit: "U17" },
+            { en: "crisp", pos: "adj.", zh: "清新的；酥脆的", example: "The morning air was crisp and cool.", unit: "U17" },
+            { en: "beam", pos: "n.", zh: "光線", example: "A beam of light shone through the window.", unit: "U17" },
+            { en: "entire", pos: "adj.", zh: "整個的", example: "He ate the entire pizza by himself.", unit: "U17" },
+            { en: "explore", pos: "v.", zh: "探討；探索", example: "We explored the ancient ruins.", unit: "U17" },
+            { en: "organize", pos: "v.", zh: "籌畫；組織", example: "She helped organize the conference.", unit: "U17" },
+            { en: "gather", pos: "v.", zh: "聚集", example: "People gathered to watch the show.", unit: "U17" },
+            { en: "participate", pos: "v.", zh: "參加", example: "Everyone was encouraged to participate.", unit: "U17" },
+            { en: "introduction", pos: "n.", zh: "介紹", example: "He gave a brief introduction of himself.", unit: "U17" },
+            { en: "changeable", pos: "adj.", zh: "可改變的", example: "The weather here is highly changeable.", unit: "U17" },
+            { en: "melt", pos: "v.", zh: "使...融化", example: "The ice will melt under the sun.", unit: "U17" },
+            { en: "temperature", pos: "n.", zh: "溫度", example: "The temperature dropped below zero.", unit: "U17" },
+            { en: "adjust", pos: "v.", zh: "調整", example: "He adjusted his tie before entering.", unit: "U17" },
+            { en: "absorb", pos: "v.", zh: "吸收", example: "Sponges absorb water easily.", unit: "U17" },
+            { en: "surrounding", pos: "adj.", zh: "周圍的", example: "He noticed the surrounding scenery.", unit: "U17" },
+            { en: "environmental", pos: "adj.", zh: "環境的", example: "We face serious environmental issues.", unit: "U17" },
+            { en: "impact", pos: "n./v.", zh: "影響", example: "Pollution has a direct impact on health.", unit: "U17" },
+            { en: "impression", pos: "n.", zh: "印象", example: "First impressions are very important.", unit: "U17" },
+            { en: "remain", pos: "v.", zh: "保持", example: "Please remain seated during takeoff.", unit: "U17" },
+            { en: "challenge", pos: "n./v.", zh: "挑戰", example: "Running a marathon is a big challenge.", unit: "U17" },
+
+            // --- Unit 18 (單字書) ---
+            { en: "journey", pos: "n.", zh: "旅行", example: "It was a long and tiring journey.", unit: "U18" },
+            { en: "wild", pos: "adj.", zh: "野生的", example: "They saw wild animals in the park.", unit: "U18" },
+            { en: "overseas", pos: "adv./adj.", zh: "在海外", example: "She plans to study overseas next year.", unit: "U18" },
+            { en: "occur", pos: "v.", zh: "發生", example: "An accident occurred at the corner.", unit: "U18" },
+            { en: "painful", pos: "adj.", zh: "痛苦的", example: "Losing a friend is very painful.", unit: "U18" },
+            { en: "intensive", pos: "adj.", zh: "密集/迅猛的", example: "He took an intensive English course.", unit: "U18" },
+            { en: "event", pos: "n.", zh: "活動；事件", example: "The festival is a major local event.", unit: "U18" },
+            { en: "major", pos: "adj.", zh: "重要的", example: "Water is a major factor in health.", unit: "U18" },
+            { en: "effort", pos: "n.", zh: "努力", example: "Winning requires hard work and effort.", unit: "U18" },
+            { en: "purpose", pos: "n.", zh: "目的", example: "What is the purpose of your visit?", unit: "U18" },
+            { en: "international", pos: "adj.", zh: "國際上的", example: "It is an international airport.", unit: "U18" },
+            { en: "grassy", pos: "adj.", zh: "充滿草的", example: "We sat down on a grassy hill.", unit: "U18" },
+            { en: "spot", pos: "n.", zh: "地點", example: "This is a great spot for a picnic.", unit: "U18" },
+            { en: "depart", pos: "v.", zh: "出發", example: "The flight will depart at 9 AM.", unit: "U18" },
+            { en: "concerned", pos: "adj.", zh: "關心的", example: "Parents are concerned about safety.", unit: "U18" },
+            { en: "pattern", pos: "n.", zh: "樣式；模式", example: "The dress has a floral pattern.", unit: "U18" },
+            { en: "observe", pos: "v.", zh: "觀察", example: "Scientists observe animal behavior.", unit: "U18" },
+            { en: "amaze", pos: "v.", zh: "使驚奇", example: "His skill amazed the audience.", unit: "U18" },
+            { en: "examination", pos: "n.", zh: "檢測；考試", example: "A thorough medical examination is needed.", unit: "U18" },
+            { en: "frequent", pos: "adj.", zh: "經常的", example: "Buses are frequent during peak hours.", unit: "U18" },
+            { en: "exactly", pos: "adv.", zh: "精確地", example: "That is exactly what I wanted.", unit: "U18" },
+            { en: "react", pos: "v.", zh: "反應", example: "How did he react to the news?", unit: "U18" },
+            { en: "position", pos: "n.", zh: "位置", example: "Find a comfortable sitting position.", unit: "U18" },
+            { en: "memory", pos: "n.", zh: "記憶力", example: "She has an excellent memory for names.", unit: "U18" },
+            { en: "naturally", pos: "adv.", zh: "自然地", example: "Act naturally during the video.", unit: "U18" },
+            { en: "guide", pos: "v./n.", zh: "引導", example: "The map will guide you safely.", unit: "U18" },
+
+            // --- R2 (課本範圍) ---
+            { en: "mystery", pos: "n.", zh: "謎團", example: "The police solved the mystery.", unit: "R2" },
+            { en: "evidence", pos: "n.", zh: "證據", example: "There is no evidence of crime.", unit: "R2" },
+            { en: "harsh", pos: "adj.", zh: "殘酷的", example: "They faced harsh winter weather.", unit: "R2" },
+            { en: "phenomenon", pos: "n.", zh: "現象", example: "Lightning is a natural phenomenon.", unit: "R2" },
+            { en: "colony collapse disorder", pos: "n.", zh: "蜂群崩壞症候群", example: "Colony collapse disorder affects bees worldwide.", unit: "R2" },
+            { en: "shrink", pos: "v.", zh: "縮減", example: "Wool sweaters shrink in hot water.", unit: "R2" },
+            { en: "factor", pos: "n.", zh: "因素", example: "Price is an important factor.", unit: "R2" },
+            { en: "resource", pos: "n.", zh: "資源", example: "Water is a precious natural resource.", unit: "R2" },
+            { en: "contribute", pos: "v.", zh: "促成；貢獻", example: "Exercise contributes to good health.", unit: "R2" },
+            { en: "pesticide", pos: "n.", zh: "殺蟲劑", example: "Farmers use pesticides on crops.", unit: "R2" },
+            { en: "supply", pos: "n./v.", zh: "供應量", example: "The food supply ran out fast.", unit: "R2" },
+            { en: "reproduce", pos: "v.", zh: "繁殖", example: "Plants reproduce in springtime.", unit: "R2" },
+            { en: "dairy", pos: "n./adj.", zh: "乳製品", example: "Cheese and milk are dairy products.", unit: "R2" },
+            { en: "pollinate", pos: "v.", zh: "授粉", example: "Bees help pollinate many crops.", unit: "R2" },
+            { en: "deserve", pos: "v.", zh: "應得", example: "You deserve a rest after work.", unit: "R2" },
+            { en: "credit", pos: "n./v.", zh: "讚揚；信用", example: "Give credit where credit is due.", unit: "R2" },
+            { en: "thrive", pos: "v.", zh: "蓬勃發展", example: "Plants thrive in sunlight.", unit: "R2" }
+        ];
+
+        let selectedUnits = ['U4', 'U5', 'U6', 'U7', 'U8', 'U9', 'U10', 'U11', 'U12', 'U13', 'U14', 'U17', 'U18', 'R2'];
+        let currentMode = 'card';
+        let currentList = [];
+        let wrongList = [];
+        let currentIndex = 0;
+        let isFlipped = false;
+
+        function toggleUnit(unit) {
+            const idx = selectedUnits.indexOf(unit);
+            if (idx > -1) {
+                if (selectedUnits.length > 1) selectedUnits.splice(idx, 1);
+            } else {
+                selectedUnits.push(unit);
+            }
+            updateUnitButtons();
+        }
+
+        function updateUnitButtons() {
+            const btns = document.querySelectorAll('.unit-btn');
+            btns.forEach((btn) => {
+                const uText = btn.innerText.replace('Unit ', 'U');
+                if (selectedUnits.includes(uText)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('mode-card').classList.toggle('active', mode === 'card');
+            document.getElementById('mode-choice').classList.toggle('active', mode === 'choice');
+            document.getElementById('mode-zh-choice').classList.toggle('active', mode === 'zh-choice');
+            document.getElementById('mode-context').classList.toggle('active', mode === 'context');
+        }
+
+        function startPractice() {
+            currentList = vocabulary.filter(item => selectedUnits.includes(item.unit));
+            if (currentList.length === 0) {
+                alert('請至少選擇一個單字範圍！');
+                return;
+            }
+            
+            wrongList = [];
+            currentList.sort(() => Math.random() - 0.5);
+            currentIndex = 0;
+            
+            document.getElementById('setup-page').classList.add('hidden');
+            document.getElementById('practice-page').classList.remove('hidden');
+            document.getElementById('result-view').classList.add('hidden');
+
+            if (currentMode === 'card') {
+                document.getElementById('flashcard-view').classList.remove('hidden');
+                document.getElementById('choice-view').classList.add('hidden');
+                showFlashcard();
+            } else {
+                document.getElementById('flashcard-view').classList.add('hidden');
+                document.getElementById('choice-view').classList.remove('hidden');
+                showQuiz();
+            }
+        }
+
+        function backToSetup() {
+            document.getElementById('setup-page').classList.remove('hidden');
+            document.getElementById('practice-page').classList.add('hidden');
+        }
+
+        function showFlashcard() {
+            isFlipped = false;
+            const item = currentList[currentIndex];
+            document.getElementById('progress-text').innerText = `${currentIndex + 1} / ${currentList.length}`;
+            
+            document.getElementById('fc-en').innerText = item.en;
+            document.getElementById('fc-pos-front').innerText = `${item.unit} | ${item.pos}`;
+            
+            document.getElementById('fc-zh').innerText = item.zh;
+            document.getElementById('fc-pos-back').innerText = `${item.unit} | ${item.pos}`;
+            document.getElementById('fc-example').innerHTML = `<strong>例句：</strong><br>${item.example}`;
+
+            document.getElementById('card-front').classList.remove('hidden');
+            document.getElementById('card-back').classList.add('hidden');
+        }
+
+        function flipCard() {
+            isFlipped = !isFlipped;
+            document.getElementById('card-front').classList.toggle('hidden', isFlipped);
+            document.getElementById('card-back').classList.toggle('hidden', !isFlipped);
+        }
+
+        function showQuiz() {
+            document.getElementById('quiz-next-area').classList.add('hidden');
+            document.getElementById('progress-text').innerText = `${currentIndex + 1} / ${currentList.length}`;
+            
+            const item = currentList[currentIndex];
+
+            if (currentMode === 'context') {
+                // 句子填空模式
+                const blankSentence = item.example.replace(new RegExp(item.en, 'gi'), '_______');
+                document.getElementById('quiz-prompt').innerText = blankSentence;
+                document.getElementById('quiz-pos').innerText = `${item.unit} | 中文意思：${item.zh}`;
+            } else {
+                const isEngToZh = (currentMode === 'choice');
+                document.getElementById('quiz-prompt').innerText = isEngToZh ? item.en : item.zh;
+                document.getElementById('quiz-pos').innerText = `${item.unit} | ${item.pos}`;
+            }
+
+            let options = [item];
+            let pool = vocabulary.filter(v => v.en !== item.en);
+            pool.sort(() => Math.random() - 0.5);
+            options.push(pool[0], pool[1], pool[2]);
+            options.sort(() => Math.random() - 0.5);
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                
+                const mainText = document.createElement('span');
+                mainText.style.fontWeight = "bold";
+
+                if (currentMode === 'context') {
+                    mainText.innerText = opt.en;
+                } else {
+                    mainText.innerText = (currentMode === 'choice') ? opt.zh : opt.en;
+                }
+                btn.appendChild(mainText);
+
+                const detailText = document.createElement('span');
+                detailText.className = 'option-detail hidden';
+                detailText.innerText = (currentMode === 'choice') ? `${opt.en} (${opt.pos})` : `${opt.zh} (${opt.pos})`;
+                btn.appendChild(detailText);
+
+                btn.onclick = () => checkAnswer(btn, opt, item);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedBtn, selectedOpt, correctOpt) {
+            const allBtns = document.querySelectorAll('.option-btn');
+
+            if (selectedOpt.en === correctOpt.en) {
+                selectedBtn.classList.add('correct');
+            } else {
+                selectedBtn.classList.add('wrong');
+                if (!wrongList.some(w => w.en === correctOpt.en)) {
+                    wrongList.push(correctOpt);
+                }
+            }
+
+            allBtns.forEach(btn => {
+                btn.onclick = null;
+                const detail = btn.querySelector('.option-detail');
+                if (detail) detail.classList.remove('hidden');
+
+                const mainText = btn.querySelector('span').innerText;
+                let correctText = correctOpt.en;
+                if (currentMode === 'choice') correctText = correctOpt.zh;
+
+                if (mainText === correctText) {
+                    btn.classList.add('correct');
+                }
+            });
+
+            document.getElementById('quiz-example').innerHTML = `<strong>完整例句：</strong><br>${correctOpt.example}<br><span style="color:var(--text-sub); font-size:14px;">(${correctOpt.zh})</span>`;
+            document.getElementById('quiz-next-area').classList.remove('hidden');
+        }
+
+        function nextCard() {
+            if (currentIndex < currentList.length - 1) {
+                currentIndex++;
+                if (currentMode === 'card') showFlashcard();
+                else showQuiz();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            document.getElementById('flashcard-view').classList.add('hidden');
+            document.getElementById('choice-view').classList.add('hidden');
+            document.getElementById('result-view').classList.remove('hidden');
+
+            const total = currentList.length;
+            const wrongCount = wrongList.length;
+            const correctCount = total - wrongCount;
+
+            if (currentMode === 'card') {
+                document.getElementById('result-stats').innerText = `已完成 ${total} 個單字的卡片複習！`;
+                document.getElementById('retry-wrong-btn').classList.add('hidden');
+            } else {
+                document.getElementById('result-stats').innerText = `答對：${correctCount} / ${total} 題` + (wrongCount > 0 ? `\n錯題：${wrongCount} 題` : '\n太強了！全對！');
+                
+                if (wrongCount > 0) {
+                    document.getElementById('retry-wrong-btn').classList.remove('hidden');
+                } else {
+                    document.getElementById('retry-wrong-btn').classList.add('hidden');
+                }
+            }
+        }
+
+        function startWrongPractice() {
+            currentList = [...wrongList];
+            wrongList = [];
+            currentList.sort(() => Math.random() - 0.5);
+            currentIndex = 0;
+
+            document.getElementById('result-view').classList.add('hidden');
+            document.getElementById('choice-view').classList.remove('hidden');
+            showQuiz();
+        }
+
+        function prevCard() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                showFlashcard();
+            }
+        }
+    </script>
+</body>
+</html>
